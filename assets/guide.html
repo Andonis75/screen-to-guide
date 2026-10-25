@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' file:; media-src 'self' file:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>__GUIDE_TITLE__ · 录屏成册</title>
+<style>
+:root{--ink:#12264c;--muted:#57647a;--blue:#194ec4;--line:#d8e0ed;--paper:#fff;--wash:#f3f6fb;--amber:#865400;--green:#17613b;--red:#a02c37;--radius:6px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 "Microsoft YaHei","PingFang SC",sans-serif}button,input,textarea,select{font:inherit}button,select{cursor:pointer}button{border:1px solid var(--line);border-radius:var(--radius);padding:8px 13px;background:white;color:var(--ink)}button:hover{border-color:var(--blue);background:var(--wash)}button:disabled{opacity:.45;cursor:default}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #92b7ff;outline-offset:3px}.primary{background:var(--blue);color:white;border-color:var(--blue)}.primary:hover{background:#113b9c;color:white}.skip{position:absolute;top:-60px;left:20px}.skip:focus{top:10px;background:white;z-index:5}header{padding:27px 4vw 23px;border-top:6px solid var(--blue);border-bottom:1px solid var(--line)}.topline,.actions,.viewer-nav,.progress-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.topline{justify-content:space-between}.brand{font-weight:700;letter-spacing:.12em}.eyebrow{color:var(--blue);font:12px/1.4 Consolas,monospace;letter-spacing:.1em;margin:0 0 8px}h1{font-size:clamp(25px,3vw,38px);line-height:1.4;margin:17px 0 8px;overflow-wrap:anywhere;letter-spacing:-.02em}h2{font-size:18px;margin:0}p{margin:8px 0}.muted,.metadata{color:var(--muted);font-size:13px}.metadata{overflow-wrap:anywhere}.notice{padding:12px 4vw;background:#eef4ff;border-bottom:1px solid #d6e3fd;font-size:13px}.notice strong{color:var(--blue)}main{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);align-items:start}.viewer{padding:29px 3vw 32px 4vw;position:sticky;top:0}.section-top{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:16px}.counter{font:13px Consolas,monospace;color:var(--blue)}.image-stage{min-height:250px;display:grid;place-items:center;background:var(--wash);border:1px solid var(--line)}#screenshot{display:block;width:100%;max-height:65vh;object-fit:contain}#screenshot[hidden],video[hidden],[hidden]{display:none!important}.placeholder{padding:45px 22px;text-align:center;color:var(--muted)}figure{margin:0}figcaption{margin:10px 0;font-size:13px;color:var(--muted)}.viewer-nav{justify-content:space-between;margin:18px 0}.video-wrap{margin-top:22px;border-top:1px solid var(--line);padding-top:17px}video{display:block;width:100%;max-height:280px;margin:10px 0;background:#eef1f5}.timestamp{font:14px Consolas,monospace}.steps-pane{border-left:1px solid var(--line);padding:29px 4vw 40px 2.5vw;min-height:70vh}.progress-row{justify-content:space-between}.progress-track{height:3px;background:var(--line);margin:14px 0 20px}.progress-fill{height:100%;width:0;background:var(--blue);transition:width .2s}.step{border-bottom:1px solid var(--line);padding:18px 0}.step:first-child{padding-top:0}.step-head{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;width:100%;padding:4px 0;border:0;background:transparent;text-align:left}.step-head:hover{background:transparent}.step-number{color:var(--muted);font:20px/1.8 Consolas,monospace}.step.active .step-number{color:var(--blue)}.step-title{font-size:16px;font-weight:700;overflow-wrap:anywhere}.step-meta{display:flex;gap:10px;align-items:center;font-size:12px;margin:5px 0}.badge{padding:1px 7px;border-radius:3px;background:#fff3d9;color:var(--amber)}.badge[data-status=confirmed]{background:#e8f5ed;color:var(--green)}.badge[data-status=uncertain]{background:#fbecef;color:var(--red)}.editor{padding-left:46px;margin-top:13px}label{display:block;font-size:12px;color:var(--muted);margin-top:12px}input,textarea,select{display:block;width:100%;padding:8px 10px;color:var(--ink);background:white;border:1px solid var(--line);border-radius:4px}textarea{min-height:78px;resize:vertical}.editor input{font-weight:600}.evidence{font-size:12px;padding:10px 12px;margin-top:12px;background:var(--wash);overflow-wrap:anywhere;white-space:pre-wrap}.remove{margin-top:14px;color:var(--red);font-size:12px;padding:5px 9px}.empty{padding:35px 0;color:var(--muted)}footer{border-top:1px solid var(--line);padding:15px 4vw;font-size:12px;color:var(--muted)}#save-state{font-size:12px;min-width:115px}#feedback{color:var(--blue);font-size:12px;min-height:1.65em}.dirty{color:var(--amber)}
+@media(max-width:900px){main{grid-template-columns:1fr}.viewer{position:static;padding:24px 5vw}.steps-pane{border-left:0;border-top:1px solid var(--line);padding:24px 5vw}.image-stage{min-height:180px}header{padding:20px 5vw}.notice{padding:12px 5vw}.editor{padding-left:0}.topline{align-items:flex-start}.actions{gap:6px}button{min-height:42px}#screenshot{max-height:52vh}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#step-list">跳到步骤复核</a>
+<header><div class="topline"><div class="brand">录屏成册 <span class="muted">/ 离线复核台</span></div><div class="actions"><span id="save-state" role="status">原始草稿</span><button id="confirm-saved" hidden>确认 JSON 已保存</button><button id="export-md">导出 Markdown</button><button class="primary" id="export-json">导出 JSON</button></div></div><h1 id="guide-title"></h1><div class="metadata" id="metadata"></div></header>
+<div class="notice"><strong>先看证据，再确认。</strong> 自动生成的步骤均需人工复核。修改只保留在当前页面，请导出保存；关闭或刷新页面会丢失未导出的修改。<details><summary>如何继续编辑已保存的草稿？</summary><p>保留 JSON、截图与录屏文件，运行 <code>scripts/run.ps1 --render-manifest 已导出的JSON --output-dir 原指南目录 --overwrite-guide</code>，然后重新打开生成的 guide.html。</p></details></div>
+<main><section class="viewer" aria-labelledby="viewer-heading"><div class="section-top"><div><p class="eyebrow">SOURCE / EVIDENCE</p><h2 id="viewer-heading">画面证据</h2></div><span class="counter" id="position"></span></div><figure><div class="image-stage"><img id="screenshot" alt="" hidden><p class="placeholder" id="image-empty">尚无可显示的截图</p></div><figcaption id="caption">选择右侧步骤，查看对应画面与时间。</figcaption></figure><div class="viewer-nav"><button id="prev" aria-label="上一步">← 上一步</button><span class="timestamp" id="timestamp"></span><button id="next" aria-label="下一步">下一步 →</button></div><div class="video-wrap"><h2 id="video-heading">录屏回放</h2><video id="video" controls preload="metadata" hidden></video><p class="muted" id="video-note"></p></div><p id="feedback" role="status" aria-live="polite"></p></section>
+<section class="steps-pane" aria-labelledby="steps-heading"><div class="progress-row"><div><p class="eyebrow">REVIEW / EDIT</p><h2 id="steps-heading">逐步复核</h2></div><span class="muted" id="progress"></span></div><div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div><details id="narration" hidden><summary id="narration-heading">查看附近旁白（原始转写，需核对）</summary><p class="muted">转写可能存在错词；操作说明以截图证据为依据。</p><div class="evidence" id="narration-text"></div></details><button id="undo-remove" hidden>撤销上次移除</button><div id="step-list" tabindex="-1"></div></section></main>
+<footer>本页完全离线工作 · 图片与录屏使用同目录内的本地文件 · JSON 保留完整复核记录，Markdown 便于分享阅读</footer>
+<noscript><p class="notice">请启用 JavaScript 查看和编辑交互指南，或直接打开同目录的 guide.md。</p></noscript>
+<script id="guide-data" type="application/json">__GUIDE_DATA__</script>
+<script>
+"use strict";
+const data=JSON.parse(document.getElementById("guide-data").textContent);
+const labels={pending:"待复核",confirmed:"已确认",uncertain:"存疑"};
+const $=id=>document.getElementById(id), make=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
+const time=s=>{const n=Math.floor(s*10);return String(Math.floor(n/600)).padStart(2,"0")+":"+String(Math.floor(n/10)%60).padStart(2,"0")+"."+n%10;};
+const local=p=>p.split("/").map(encodeURIComponent).join("/");
+let active=0,dirty=false,revision=0,lastExportRevision=-1,removedStep=null;
+const video=$("video");
+$("guide-title").textContent=data.title;
+$("metadata").textContent="来源："+(data.source.name||"未注明")+"   ·   生成："+(data.created_at||"未注明")+"   ·   "+(!data.frames.length?"无证据草稿":data.processing.mode==="evidence"?"画面证据模式":"本地分析草稿")+(data.processing.agent_review?"   ·   Agent 已按画面修订，仍待你确认":"");
+if(!data.frames.length&&data.steps.length)$("viewer-heading").textContent="附带画面 · 未校验";
+if(data.video){video.src=local(data.video);video.hidden=false;const derived=data.processing.playback&&data.processing.playback.derived_copy;$("video-heading").textContent=derived?"录屏回放 · 兼容副本":"原始录屏";$("video-note").textContent=derived?"本地生成的 H.264 播放副本，可能有压缩或色彩转换；截图仍来自原视频。选择步骤可定位时间。":"选择步骤可定位录屏时间，播放由你控制。";video.addEventListener("error",()=>{$("video-note").textContent="录屏未能加载。请检查本地视频文件及浏览器支持；仍可查看截图与时间。";});}else{$("video-note").textContent="本指南未附带播放副本。请在原始文件中按步骤时间定位。";}
+function changed(){revision++;dirty=true;$("save-state").textContent="有修改 · 请导出";$("save-state").className="dirty";$("confirm-saved").hidden=true;}
+function progress(){const total=data.steps.length,confirmed=data.steps.filter(s=>s.review_status==="confirmed").length;$("progress").textContent=confirmed+" / "+total+" 已确认";$("progress-fill").style.width=(total?confirmed/total*100:0)+"%";}
+function select(index,seek=true){
+ active=index;const step=data.steps[index],total=data.steps.length;
+ document.querySelectorAll(".step").forEach((el,i)=>{el.classList.toggle("active",i===index);el.querySelector(".editor").hidden=i!==index;el.querySelector(".step-head").setAttribute("aria-expanded",String(i===index));});
+ $("position").textContent=total?String(index+1).padStart(2,"0")+" / "+String(total).padStart(2,"0"):"00 / 00";
+ $("prev").disabled=!total||index===0;$("next").disabled=!total||index===total-1;
+ const img=$("screenshot");img.hidden=true;img.removeAttribute("src");$("image-empty").hidden=false;$("image-empty").textContent=step?"此步骤没有附带截图":"暂无步骤，可查看原始录屏。";
+ $("caption").textContent=step?step.title:"选择右侧步骤，查看对应画面与时间。";$("timestamp").textContent=step?time(step.timestamp_seconds):"";
+ const lower=step?Math.max(0,step.timestamp_seconds-2):0,upper=step?Math.max(step.timestamp_seconds+2,step.end_seconds??data.steps[index+1]?.timestamp_seconds??step.timestamp_seconds+8):0;
+ const nearby=step&&data.source.has_audio!==false?data.transcript.filter(s=>s.text.trim()&&s.end_seconds>=lower&&s.start_seconds<=upper):[];
+ $("narration").hidden=nearby.length===0;$("narration-text").textContent=nearby.map(s=>time(s.start_seconds)+"–"+time(s.end_seconds)+"  "+s.text).join("\n");
+ if(step&&step.image){img.alt="步骤 "+(index+1)+"："+step.title;img.onload=()=>{img.hidden=false;$("image-empty").hidden=true;};img.onerror=()=>{$("image-empty").textContent="截图未能加载，请保留 frames 文件夹与指南的相对位置。";};img.src=local(step.image);}
+ if(step&&seek&&data.video){try{video.currentTime=step.timestamp_seconds;}catch(_){/* Metadata may not yet be ready. */}}
+}
+function field(editor,label,value,oninput,tag="input"){
+ const wrapper=make("label",label),input=make(tag);if(tag==="input")input.type="text";input.value=value;input.addEventListener("input",()=>{oninput(input.value);changed();});wrapper.append(input);editor.append(wrapper);return input;
+}
+function render(seek=false){
+ const list=$("step-list");list.replaceChildren();
+ if(!data.steps.length)list.append(make("p","暂无步骤。可以回到处理流程调整抽帧设置后重新生成。"));
+ data.steps.forEach((step,index)=>{
+  const article=make("article");article.className="step";const head=make("button");head.className="step-head";head.type="button";head.setAttribute("aria-controls","editor-"+index);
+  const num=make("span",String(index+1).padStart(2,"0"));num.className="step-number";const content=make("span"),title=make("span",step.title||"未命名步骤");title.className="step-title";
+  const meta=make("span");meta.className="step-meta";const badge=make("span",labels[step.review_status]);badge.className="badge";badge.dataset.status=step.review_status;meta.append(make("span",time(step.timestamp_seconds)),badge);if(step.basis==="unverified_draft")meta.append(make("span","无证据草稿"));content.append(title,meta);head.append(num,content);head.addEventListener("click",()=>select(index));
+  const editor=make("div");editor.className="editor";editor.id="editor-"+index;
+  if(step.basis==="unverified_draft"){const warning=make("p","无证据草稿：未提供抽帧记录，时间与截图未经来源关联校验。");warning.className="evidence";editor.append(warning);}
+  field(editor,"步骤标题",step.title,v=>{step.title=v;title.textContent=v||"未命名步骤";$("caption").textContent=v;});field(editor,"操作说明",step.description,v=>step.description=v,"textarea");
+  if(step.observed_text.length){const evidence=make("details");evidence.className="evidence";evidence.append(make("summary","查看 OCR 候选文字（需核对）"),make("div",step.observed_text.join(" / ")));editor.append(evidence);}
+  field(editor,"复核备注",step.review_notes,v=>step.review_notes=v,"textarea");
+  const statusLabel=make("label","复核状态"),status=make("select");for(const [key,label] of Object.entries(labels)){const opt=make("option",label);opt.value=key;status.append(opt);}status.value=step.review_status;statusLabel.append(status);editor.append(statusLabel);
+  status.addEventListener("change",()=>{step.review_status=status.value;badge.textContent=labels[status.value];badge.dataset.status=status.value;progress();changed();});
+  const remove=make("button","移除此步");remove.className="remove";remove.addEventListener("click",()=>{if(!confirm("移除此步骤？原始截图和录屏文件不会删除。"))return;removedStep={index,step};data.steps.splice(index,1);$("undo-remove").hidden=false;active=Math.max(0,Math.min(active,data.steps.length-1));changed();render(true);$("feedback").textContent="步骤已移除，可撤销上次移除；请导出保存。";$("step-list").focus();});editor.append(remove);article.append(head,editor);list.append(article);
+ });progress();select(active,seek);
+}
+const md=v=>String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/[\\`*_{}\[\]()#+.!|>~\-]/g,"\\$&");
+function markdown(){
+ const lines=["# "+md(data.title),"","来源："+md(data.source.name||"未注明"),"生成时间："+md(data.created_at),"","人工复核状态以每步标记为准；画面推断不等同于已确认操作。",""];
+ if(data.processing.agent_review)lines.push("本稿已由 Agent 对照原始截图修订，非本地模型直出，也不代表用户已确认。","");
+ data.steps.forEach((s,i)=>{lines.push("## "+(i+1)+". "+md(s.title),"","时间："+time(s.timestamp_seconds)+" · 状态："+labels[s.review_status],"",md(s.description),"");if(s.basis==="unverified_draft")lines.push("无证据草稿：未提供抽帧记录，时间与截图未经来源关联校验。","");if(s.image)lines.push("![步骤 "+(i+1)+" 截图](<"+local(s.image)+">)","");if(s.observed_text.length)lines.push("画面文字："+s.observed_text.map(md).join(" / "),"");if(s.review_notes)lines.push("复核备注："+md(s.review_notes),"");});if(!data.steps.length)lines.push("暂无步骤。","");if(data.source.has_audio!==false&&data.transcript.length){lines.push("## 语音转写（需核对）","");data.transcript.filter(s=>s.text.trim()).forEach(s=>lines.push(time(s.start_seconds)+"–"+time(s.end_seconds)+"："+md(s.text),""));}return lines.join("\n");
+}
+function download(kind){
+ const isJson=kind==="json",blob=new Blob([isJson?JSON.stringify(data,null,2)+"\n":markdown()],{type:isJson?"application/json;charset=utf-8":"text/markdown;charset=utf-8"});const url=URL.createObjectURL(blob),link=make("a");link.href=url;link.download=isJson?"steps-reviewed.json":"guide-reviewed.md";document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+ if(isJson){lastExportRevision=revision;$("confirm-saved").hidden=!dirty;}$("save-state").textContent=isJson?"JSON 导出已触发":"Markdown 导出已触发";$("save-state").className=dirty?"dirty":"";$("feedback").textContent="已请求下载，请检查浏览器下载结果。"+(!isJson?" JSON 可保留全部复核数据。":"确认文件已保存后，可点击“确认 JSON 已保存”。");
+}
+$("prev").addEventListener("click",()=>select(active-1));$("next").addEventListener("click",()=>select(active+1));$("export-json").addEventListener("click",()=>download("json"));$("export-md").addEventListener("click",()=>download("md"));
+$("confirm-saved").addEventListener("click",()=>{if(lastExportRevision!==revision)return;dirty=false;$("save-state").textContent="已确认 JSON 保存";$("save-state").className="";$("confirm-saved").hidden=true;});
+$("undo-remove").addEventListener("click",()=>{if(!removedStep)return;active=Math.min(removedStep.index,data.steps.length);data.steps.splice(active,0,removedStep.step);removedStep=null;$("undo-remove").hidden=true;changed();render(true);$("feedback").textContent="已恢复上次移除的步骤，请导出保存。";$("step-list").focus();});
+video.addEventListener("loadedmetadata",()=>{if(data.steps[active])video.currentTime=data.steps[active].timestamp_seconds;});
+window.addEventListener("beforeunload",event=>{if(dirty){event.preventDefault();event.returnValue="";}});
+render();
+</script>
+</body></html>

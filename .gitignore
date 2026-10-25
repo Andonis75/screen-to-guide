@@ -1,0 +1,13 @@
+.runtime/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+.env
+.env.*
+!.env.example
+*.log
+dist/
+node_modules/
+/申请材料/
+/录屏成册-申请材料/

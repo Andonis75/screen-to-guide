@@ -1,0 +1,17 @@
+{
+  "version": "0.1.5",
+  "display_name": "录屏成册",
+  "model_id": "OpenVINO/Qwen2.5-VL-7B-Instruct-int4-ov",
+  "model_revision": "48494b1aceaf169fc276b912baa876aa0e43e535",
+  "model_dir": ".runtime/models/vlm",
+  "asr_model_id": "OpenVINO/whisper-base-fp16-ov",
+  "asr_model_revision": "84fbe975a79a8c996fd32c036558f29e2db6670f",
+  "asr_model_dir": ".runtime/models/whisper",
+  "device": "CPU",
+  "max_frames": 12,
+  "sample_interval": 1.0,
+  "max_duration_seconds": 1800,
+  "max_file_bytes": 2147483648,
+  "max_new_tokens": 220,
+  "analysis_max_edge": 960
+}
