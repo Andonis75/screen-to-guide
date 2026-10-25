@@ -1,21 +1,24 @@
-# 录屏成册：技术设计与运行说明
+# 知行册：技术设计与运行说明
 
-适用版本：0.1.5。更新日期：2026-10-25。
+适用版本：0.2.0。更新日期：2026-10-25。
 
-录屏成册（Screen to Guide）是一套由 Agent Skill 与本地 Python 程序共同完成的视频转文档流程。它把软件操作录屏或教学视频整理成可阅读、可跟做、可回看来源的文档，输出 HTML、Markdown、结构化 JSON 与截图。
+知行册（Screen to Guide）是一套由 Agent Skill 与本地 Python 程序共同完成的视频转文档流程。它把软件操作录屏或教学视频整理成看得懂、跟得上的图文指南，输出 HTML、Markdown、结构化 JSON 与截图。技术标识与仓库名称保留 `screen-to-guide`。
 
-项目要解决的是视频知识难以查找和复用的问题：学习者为了找一个按钮、命令或参数，往往需要反复拖动进度；文档制作者则需要转写、截图、记录时间、组织步骤，再逐项核对。录屏成册把这些工作接到同一条流程里，同时保留正文与原片之间的联系。
+项目要解决的是视频知识难以理解、查找和复用的问题：学习者为了找一个按钮、命令或参数，往往需要反复拖动进度；文档制作者则需要整理旁白、截图、记录时间、解释原理和组织步骤，再逐项核对。知行册把这些工作接到同一条流程里，同时保留正文与原片之间的联系。
 
 ## 1. 系统分工
 
 ```mermaid
 flowchart TD
-    A[本地视频文件] --> B[FFprobe 校验媒体与输入边界]
+    U[公开链接：可选 yt-dlp 获取] --> A[本地视频文件与字幕]
+    A --> B[FFprobe 校验媒体与输入边界]
     B --> C[FFmpeg 抽帧、音轨与播放副本]
     C --> D[OpenVINO CPU：PP-OCR 文字识别]
-    C --> E[OpenVINO GenAI CPU：Whisper 语音转写]
+    B --> S[优先筛选已有字幕]
+    S --> G[带时间与来源的结构化材料]
+    S -->|无可用字幕| E[OpenVINO GenAI CPU：Whisper 全音轨转写]
     C --> F[软件录屏模式：Qwen2.5-VL 画面观察]
-    D --> G[带时间与来源的结构化材料]
+    D --> G
     E --> G
     F --> G
     G --> H[Agent 阅读全量材料、补看片段、编写中间稿]
@@ -35,7 +38,7 @@ flowchart TD
 
 | 本项目能力 | Intel 组件与实际调用 | 模型来源 | 当前实现与实测范围 |
 | --- | --- | --- | --- |
-| 语音转写 | `openvino_genai.WhisperPipeline`，兼容 `ASRPipeline`；生成带时间戳的转写段落 | OpenAI Whisper base；使用 OpenVINO 发布的 FP16 转换版本 | 教学模式将完整音轨送入本地 CPU；软件模式可选启用 |
+| 语音转写 | `openvino_genai.WhisperPipeline`，兼容 `ASRPipeline`；生成带时间戳的转写段落 | OpenAI Whisper base；使用 OpenVINO 发布的 FP16 转换版本 | 教学模式缺少可用字幕时将完整音轨送入本地 CPU；软件模式可选启用 |
 | 画面文字识别 | `openvino.Core()` → `read_model()` → `compile_model(..., "CPU")` → `infer()` | PaddleOCR 的 PP-OCRv4 检测、识别模型，配套方向分类模型；经 RapidOCR 封装 | 检测并识别抽取画面中的按钮、字段、命令等文字；当前适配器固定使用 CPU |
 | 软件界面观察 | `openvino_genai.VLMPipeline` 与 `openvino.Tensor` | Qwen2.5-VL-7B-Instruct；使用 OpenVINO 发布的 INT4 转换版本 | 软件录屏模式默认 CPU；教学模式不调用此视觉大模型 |
 
@@ -57,11 +60,19 @@ flowchart TD
 
 ### 教学视频
 
-入口为 [`scripts/prepare_lesson.py`](../scripts/prepare_lesson.py)。它处理完整音轨，默认最多提取 64 张画面，可调整至 96 张，并生成 OCR、联系表与每 30 秒的材料覆盖索引。索引明确记录该时间窗是否实际存在转写和截图；邻近截图不会被标成窗内证据。
+入口为 [`scripts/prepare_lesson.py`](../scripts/prepare_lesson.py)。它先寻找与视频同名、或附语言后缀的 SRT、VTT、JSON3 字幕，也接受显式字幕或转写导入。材料流程记录字幕来源，检查格式、时间顺序与覆盖范围；时间筛选不通过时回退本地全音轨 ASR。画面里已经显示字幕，不代表存在独立可读取的字幕文件。
 
-Agent 阅读完整转写并按时间查看全部联系表，必要时查看原图或用 `sample_sequence.py` 补采短片段，随后编写 `analysis/lesson-manifest.json`。正文包括章节说明、准备事项、实操步骤、代码块、原始截图、视频时间与必要参考资料。原片中未演示的内容不会被写成已经演示完成。
+随后默认最多提取 64 张画面，可调整至 96 张，并生成 OCR、联系表与每 30 秒的材料覆盖索引。索引明确记录该时间窗是否实际存在文字与截图；邻近截图不会被标成窗内证据。字幕来源与是否执行过 ASR 分别记录，不把导入字幕标成模型转写成绩。
+
+Agent 阅读全部字幕或转写并按时间查看联系表，必要时查看原图或用 `sample_sequence.py` 补采短片段，随后编写 `analysis/lesson-manifest.json`。正文先用可选 `quick_overview` 概览主要知识与流程，再提供章节说明、准备事项、实操步骤、代码块、原始截图、视频时间与必要参考资料。包名、启动命令、参数层级和路径需要对照可见画面；图注只描述该图实际显示的状态。原片中未演示的内容不会被写成已经演示完成。
 
 固定入口 [`scripts/render_lesson.py`](../scripts/render_lesson.py) 从中间稿一次生成 `guide.html`、`guide.md`、`lesson.json`。需要修改正文时，修订中间稿后重新生成，不直接补写最终 HTML 或 Markdown。
+
+### 处理结果复用
+
+教学入口的 `--resume` 根据源视频哈希、字幕来源及处理参数核对任务身份，再检查各阶段产物的哈希。完成的字幕/转写、音轨、抽帧与联系表、OCR、播放副本可以复用；缺失或损坏的阶段重新生成，输入或参数变化则要求新目录。缓存与来源记录留在该输出目录，不通过猜测文件名跨视频复用。
+
+阶段缓存降低失败重跑成本，不等于 Agent 的内容写作和复审自动断点恢复。字幕命中与缓存命中都不免除原片核对，也不把模型置信度转换成准确率。
 
 ## 4. 媒体、时间轴与阅读体验
 
@@ -84,7 +95,7 @@ Windows 首先准备 Python 3.11，以及可从 `PATH` 找到的 FFmpeg 和 ffpr
 # 独立环境和依赖；首次需要联网
 .\scripts\run.ps1 --setup
 
-# 教学视频只需准备语音模型；OCR 资源随项目提供
+# 教学视频准备语音回退能力；可用字幕命中时不运行 ASR
 .\scripts\run.ps1 --prepare-model --kind asr
 .\scripts\run.ps1 --doctor
 .\scripts\run.ps1 --capabilities
@@ -104,6 +115,8 @@ python .\scripts\prepare_lesson.py "D:\Videos\lesson.mp4" `
 
 已有同名文档需要重新生成时，加 `--overwrite-guide`。该操作不需要再次转写整段音轨或重新运行模型。
 
+同一材料任务中断后，在原 `prepare_lesson.py` 命令追加 `--resume`。字幕可通过 `--subtitle-file` 指定；`--no-subtitles` 强制本地 ASR。更换视频、字幕来源或处理参数时使用新输出目录。
+
 软件录屏模式另行准备视觉模型：
 
 ```powershell
@@ -118,7 +131,7 @@ python .\scripts\prepare_lesson.py "D:\Videos\lesson.mp4" `
 
 > 使用 screen-to-guide，把本地教学视频整理成包含原理说明、操作步骤、代码、截图和章节回看的文档。按照教学模式完成材料分析、中间稿和固定渲染，不手动修改生成文档。
 
-公开链接需要先取得完整、可播放的媒体，再传入本地入口。yt-dlp 可作为外部素材获取工具，但当前项目 CLI 没有集成一个保证任意平台下载成功的接口；站点权限、登录状态、可用清晰度和平台变化会影响获取结果。标题、网页简介或低清预览不能代替完整视频。
+公开链接可先通过 `scripts/acquire_video.py` 获取单条完整媒体和可用字幕，再使用返回的本地路径。下载依赖通过 `requirements-download.txt` 显式安装；下载器使用 yt-dlp，优先尝试所选语言的字幕，字幕失败不丢弃已完成的视频。视频选择可用的最高不超过 1080p 的格式，实际分辨率、时长和哈希保留在获取记录中。它不自动读取浏览器账号；站点权限、可用清晰度和平台变化仍可能使普通获取失败，标题或网页简介不能代替完整视频。
 
 ## 6. 文件与数据契约
 
@@ -127,7 +140,9 @@ python .\scripts\prepare_lesson.py "D:\Videos\lesson.mp4" `
 | `SKILL.md`、`references/` | Agent 的处理流程、内容依据和检查要求 |
 | `config.json` | 固定模型、revision、默认设备与参数 |
 | `scripts/run.py` | 环境准备、模型准备、检查、软件录屏分析和渲染入口 |
-| `scripts/prepare_lesson.py` | 教学视频完整转写、画面与 OCR 材料 |
+| `scripts/acquire_video.py` | 可选公开链接获取、字幕下载、媒体校验与下载恢复 |
+| `scripts/prepare_lesson.py` | 教学视频字幕优先、本地 ASR 回退、画面与 OCR 材料 |
+| `scripts/screen_guide/subtitles.py`、`lesson_cache.py` | 字幕格式归一与时间筛选、绑定来源的阶段缓存 |
 | `scripts/render_lesson.py`、`assets/lesson.html` | 教学稿校验、固定页面与章节播放器 |
 | `lesson-evidence.json`、`analysis/` | 来源、材料覆盖、转写、处理记录及中间稿 |
 | `guide.html`、`guide.md`、`lesson.json` | 教学模式阅读文档及结构化正文 |
@@ -136,6 +151,8 @@ python .\scripts\prepare_lesson.py "D:\Videos\lesson.mp4" `
 | `.runtime/` | 本地环境、模型、缓存和默认输出，不属于公开分发内容 |
 
 教学 manifest 的 `sections` 必须按时间排序、不重叠且位于视频时长内；截图时间必须位于所属章节，引用必须对应实际存在的本地文件。章节可以留有未教学内容的间隔，因此完整性还需 Agent 结合覆盖记录检查，不能只凭结构校验判断整片已完整讲解。
+
+`quick_overview` 为可省略的纯文本数组，最多 8 条、每条 300 字以内，通常由 Agent 编写 3–6 条重点。渲染器在 HTML 和 Markdown 中显示同一概览，旧 manifest 无此字段时保留原布局。
 
 渲染器将正文作为文本处理，对嵌入 JSON 转义，限制本地媒体路径与扩展名，拒绝目录穿越和非法外链。HTML 使用内置样式与脚本，不依赖在线 CDN；完整目录可以离线阅读，下载 Markdown 或打印。分享时需保留媒体相对路径。
 
@@ -156,3 +173,7 @@ Agent 的推理服务和数据处理规则由宿主决定。将截图、转写�
 - [RapidOCR](https://github.com/RapidAI/RapidOCR) 与 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
 这些链接说明上游组件；本项目的实际功能与设备覆盖以代码、固定版本配置和实测记录为准。
+
+## 9. 工作流借鉴
+
+0.2.0 的字幕优先、阶段结果复用与简洁概览，借鉴了 [BiliNote](https://github.com/JefferyHcool/BiliNote) 在素材处理和笔记组织上的思路。相关实现按本项目的本地模型、来源哈希和 Agent 复核流程独立编写，未复制对方生成正文或源码。两者使用的写作模型与复核方式不同，单条视频的结果不代表通用性能排名。

@@ -29,7 +29,7 @@ def configuration():
 
 
 def parser():
-    result = argparse.ArgumentParser(description="录屏成册：本地录屏 → 可人工复核的图文手册")
+    result = argparse.ArgumentParser(description="知行册：本地录屏 → 可人工复核的图文手册")
     result.add_argument("input", nargs="?", help="本地录屏文件")
     actions = result.add_mutually_exclusive_group()
     for action in ("setup", "doctor", "capabilities", "prepare-model"):

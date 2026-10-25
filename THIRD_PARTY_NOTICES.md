@@ -32,6 +32,12 @@
 
 OpenVINO / OpenVINO GenAI 由 Intel 提供，负责本地推理；不表示已验证某种 Intel 硬件。
 FFmpeg / FFprobe 由系统现有安装提供，本包不重新分发其二进制文件。
+yt-dlp 是可选的视频获取依赖，版本单独固定在 `requirements-download.txt`；用户显式安装后由下载入口调用，发布包不包含其程序或下载媒体。
+上游：https://github.com/yt-dlp/yt-dlp
 OpenCV、Pillow、NumPy、PyClipper、Shapely、PyYAML、Hugging Face Hub 等依赖保留各自上游许可证。
+
+## 工作流参考
+
+0.2.0 参考了 [BiliNote](https://github.com/JefferyHcool/BiliNote) 的字幕复用、任务恢复和笔记组织思路。本项目的字幕解析、阶段缓存、获取入口及概览渲染为独立实现，未复制该项目代码。单条视频对照不作为通用质量排名。
 
 `scripts/create_test_fixture.py` 生成的界面、项目名称和文件均为虚构工程素材，用于验证程序流程。

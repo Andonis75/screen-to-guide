@@ -1,4 +1,4 @@
 interface:
-  display_name: "录屏成册"
-  short_description: "把本地操作录屏整理成能照着做的图文指南，附操作步骤、截图与视频定位"
-  default_prompt: "使用 $screen-to-guide 把这段本地录屏整理为能照着做的操作指南。回看关键动作，写清点击顺序、填写内容和异常处理，输出阅读版 HTML、Markdown 与 JSON；识别原文和制作备注留在内部记录。"
+  display_name: "知行册"
+  short_description: "把视频整理成看得懂、跟得上的图文指南，包含原理、步骤、截图与章节回看"
+  default_prompt: "使用 $screen-to-guide 把这段视频整理成看得懂、跟得上的图文指南。按输入选择教学或操作录屏流程，结合字幕、旁白与原画面写清原理、步骤、参数和完成标志，通过固定渲染器输出 HTML、Markdown 与 JSON；识别原文和制作备注留在内部记录。"

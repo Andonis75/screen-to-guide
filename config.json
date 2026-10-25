@@ -1,6 +1,6 @@
 {
-  "version": "0.1.5",
-  "display_name": "录屏成册",
+  "version": "0.2.0",
+  "display_name": "知行册",
   "model_id": "OpenVINO/Qwen2.5-VL-7B-Instruct-int4-ov",
   "model_revision": "48494b1aceaf169fc276b912baa876aa0e43e535",
   "model_dir": ".runtime/models/vlm",
