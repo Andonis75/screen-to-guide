@@ -18,11 +18,12 @@
 </head>
 <body>
 <a class="skip" href="#document">跳到教材正文</a>
-<header class="masthead"><span class="brand">录屏成册 / 阅读教材</span><div class="tools"><button id="download-md" type="button">下载 Markdown</button><button id="print-guide" type="button">打印 / 存为 PDF</button></div></header>
+<header class="masthead"><span class="brand">知行册 / 阅读教材</span><div class="tools"><button id="download-md" type="button">下载 Markdown</button><button id="print-guide" type="button">打印 / 存为 PDF</button></div></header>
 <div class="layout">
 <nav class="contents" aria-label="章节目录"><h2>本篇目录</h2><ol id="toc"></ol></nav>
 <main class="document" id="document">
 <header class="intro" id="overview"><p class="eyebrow" id="chapter-count"></p><h1 id="title"></h1><p class="summary" id="summary"></p><div class="metadata" id="metadata"></div><button id="watch-all" class="watch" type="button" hidden>播放完整视频</button><p id="download-status" class="status" role="status" aria-live="polite"></p></header>
+<section class="auxiliary" id="quick-overview" hidden><h2>先看重点</h2><ul class="points" id="quick-overview-points"></ul></section>
 <section class="auxiliary" id="preparation" hidden><h2>开始前</h2><ul class="prerequisites" id="prerequisites"></ul></section>
 <div id="chapters"></div>
 <section class="auxiliary" id="terms" hidden><h2>术语速查</h2><dl class="glossary" id="glossary"></dl></section>
@@ -43,6 +44,7 @@ function external(title,url){const a=make("a",title);a.href=url;a.target="_blank
 $("title").textContent=data.title;$("summary").textContent=data.summary;$("summary").hidden=!data.summary;
 $("chapter-count").textContent=data.sections.length+" 章 · "+time(data.source.duration_seconds)+" 视频教材";$("footer-count").textContent=data.sections.length+" 章 · 离线阅读";
 $("metadata").append(make("span",data.source.name));if(data.source.author)$("metadata").append(make("span","作者："+data.source.author));if(data.source.url)$("metadata").append(external("查看来源 ↗",data.source.url));toc("overview","课程概览");
+if(data.quick_overview&&data.quick_overview.length){$("quick-overview").hidden=false;data.quick_overview.forEach(item=>$("quick-overview-points").append(make("li",item)));toc("quick-overview","先看重点");}
 if(data.prerequisites.length){$("preparation").hidden=false;data.prerequisites.forEach(item=>$("prerequisites").append(make("li",item)));toc("preparation","开始前");}
 // LESSON_PLAYER_START
 const video=$("video"),player=$("player");

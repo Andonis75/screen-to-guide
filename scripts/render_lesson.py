@@ -31,6 +31,19 @@ def _texts(value, name):
     return [_text(item, name) for item in _array(value, name)]
 
 
+def _quick_overview(value):
+    """Keep the optional reading shortcut short and authored, never inferred."""
+    if not isinstance(value, list) or len(value) > 8:
+        raise ValueError("quick_overview must be an array of at most 8 text items")
+    result = []
+    for item in value:
+        text = _text(item, "quick_overview item", nonempty=True).strip()
+        if len(text) > 300:
+            raise ValueError("quick_overview items must be at most 300 characters")
+        result.append(text)
+    return result
+
+
 def _seconds(value, name):
     if (isinstance(value, bool) or not isinstance(value, (int, float))
             or value < 0 or value > 2**40 or not math.isfinite(value)):
@@ -112,6 +125,7 @@ def validate_lesson(manifest, output_dir):
     data = {"schema_version": 1, "kind": "lesson",
             "title": _text(manifest.get("title"), "title", nonempty=True),
             "summary": _text(manifest.get("summary", ""), "summary"), "source": source_data,
+            "quick_overview": _quick_overview(manifest.get("quick_overview", [])),
             "prerequisites": _texts(manifest.get("prerequisites", []), "prerequisites"),
             "sections": [], "glossary": [], "references": []}
     if manifest.get("video") is not None:
@@ -194,6 +208,9 @@ def lesson_markdown(data):
         lines += ["[查看来源](<" + quote(source["url"], safe=":/?#@!$&*+,;=%") + ">)", ""]
     if data.get("video"):
         lines += ["[打开本地视频](<" + quote(data["video"], safe="/") + ">)", ""]
+    if data.get("quick_overview"):
+        lines += ["## 先看重点", ""]
+        lines += ["- " + _md(text).replace("\n", "\n  ") for text in data["quick_overview"]] + [""]
     if data["prerequisites"]:
         lines += ["## 开始前", ""]
         lines += ["- " + _md(text).replace("\n", "\n  ") for text in data["prerequisites"]] + [""]

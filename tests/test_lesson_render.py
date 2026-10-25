@@ -118,6 +118,7 @@ class LessonRendererTests(unittest.TestCase):
     def test_html_and_embedded_json_treat_user_content_as_text(self):
         attack = '</script><script>alert("payload")</script><img src=x onerror=alert(1)> & __LESSON_DATA__'
         self.manifest["title"] = attack
+        self.manifest["quick_overview"] = [attack]
         self.manifest["sections"][0]["paragraphs"] = [attack]
         self.manifest["sections"][0]["note"] = attack
         self.manifest["sections"][0]["images"][0]["caption"] = attack
@@ -130,11 +131,43 @@ class LessonRendererTests(unittest.TestCase):
         self.assertFalse(any("onerror" in attrs for _, attrs in parsed.tags))
         payload = json.loads("".join(parsed.payload))
         self.assertEqual(payload["lesson"]["title"], attack)
+        self.assertEqual(payload["lesson"]["quick_overview"], [attack])
         self.assertEqual(payload["lesson"]["sections"][0]["paragraphs"], [attack])
         self.assertNotIn("</script><script>alert", outputs["guide.html"])
         self.assertNotIn("<img src=x", outputs["guide.md"])
         self.assertIn("&lt;/script&gt;", outputs["guide.md"])
         self.assertIn("&amp;", outputs["guide.md"])
+
+    def test_quick_overview_is_shared_by_reading_exports_before_preparation(self):
+        self.manifest["quick_overview"] = ["  先配置环境，再验证连接。  ", "保留完整章节，不把概览当操作步骤。"]
+        before = copy.deepcopy(self.manifest)
+        renderer.render_lesson(self.manifest, self.output)
+        outputs = self.read_outputs()
+        saved = json.loads(outputs["lesson.json"])
+        parsed = PageParser()
+        parsed.feed(outputs["guide.html"])
+        payload = json.loads("".join(parsed.payload))
+        expected = ["先配置环境，再验证连接。", "保留完整章节，不把概览当操作步骤。"]
+        self.assertEqual(saved["quick_overview"], expected)
+        self.assertEqual(payload["lesson"]["quick_overview"], expected)
+        self.assertEqual(payload["markdown"], outputs["guide.md"])
+        self.assertLess(outputs["guide.md"].index("## 先看重点"), outputs["guide.md"].index("## 开始前"))
+        self.assertIn("最后一章完整内容。", outputs["guide.md"])
+        self.assertEqual(self.manifest, before)
+
+    def test_quick_overview_rejects_nontext_blank_or_unbounded_input(self):
+        for value in (None, "a summary", {}, [1], ["   "], ["\n\t"], ["x" * 301], ["point"] * 9):
+            with self.subTest(value=value):
+                bad = copy.deepcopy(self.manifest)
+                bad["quick_overview"] = value
+                self.assert_rejected_without_guides(bad)
+        self.manifest["quick_overview"] = ["x" * 300] * 8
+        self.assertEqual(len(renderer.validate_lesson(self.manifest, self.output)["quick_overview"]), 8)
+
+    def test_empty_quick_overview_does_not_add_a_markdown_section(self):
+        self.manifest["quick_overview"] = []
+        renderer.render_lesson(self.manifest, self.output)
+        self.assertNotIn("## 先看重点", self.read_outputs()["guide.md"])
 
     def test_code_fence_preserves_code_with_long_backtick_runs(self):
         code = "# exact code\n```markdown\ntext\n```\n````\n<script>code only</script>"
@@ -221,6 +254,8 @@ class LessonRendererTests(unittest.TestCase):
         self.assertIn("概念解释正文。", outputs["guide.md"])
         saved = json.loads(outputs["lesson.json"])
         self.assertEqual(saved["sections"][0]["steps"], [])
+        self.assertEqual(saved["quick_overview"], [])
+        self.assertNotIn("## 先看重点", outputs["guide.md"])
         self.assertNotIn("action_evidence", saved)
 
 
