@@ -14,7 +14,7 @@ def main():
         raise ValueError("config.json version must be a semantic version")
     target = ROOT.parent / f"screen-to-guide-v{version}.zip"
     allowed = {"SKILL.md", "README.md", "THIRD_PARTY_NOTICES.md", "LICENSE", "config.json",
-               "requirements.txt", "requirements-dev.txt", ".gitignore"}
+               "requirements.txt", "requirements-dev.txt", "requirements-download.txt", ".gitignore"}
     folders = {"scripts", "assets", "agents", "references", "tests", "vendor", "docs", "examples"}
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
         for file in sorted(ROOT.rglob("*")):

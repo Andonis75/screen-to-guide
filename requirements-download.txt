@@ -1,0 +1,2 @@
+# Optional public-link acquisition; local video processing does not need this.
+yt-dlp==2026.10.21
